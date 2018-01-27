@@ -11,10 +11,12 @@ public class DriveTeleop extends Command {
 
 	@Override
 	protected void initialize() {
+		
 	}
 
 	@Override
 	protected void execute() {
+		Robot.driveSubsystem.arcadeDrive(Robot.oi.getRightX(), -Robot.oi.getRightY());
 	}
 
 	@Override
