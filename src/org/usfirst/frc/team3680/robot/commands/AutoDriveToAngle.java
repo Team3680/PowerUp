@@ -2,6 +2,7 @@ package org.usfirst.frc.team3680.robot.commands;
 
 import org.usfirst.frc.team3680.robot.Robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.command.Command;
 
 /**
@@ -17,25 +18,28 @@ public class AutoDriveToAngle extends Command {
         requires(Robot.driveSubsystem);
         commandAngle = angle;
         commandRotationDirection = rotationDirection;
+        
     }
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    		Robot.driveSubsystem.gyro.reset();
     		setTimeout(10);
+    		System.out.println(commandAngle);
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
     	
-    	while(Robot.driveSubsystem.getGyroAngle() < commandAngle) {
-    		Robot.driveSubsystem.arcadeDrive(0,0.65*commandRotationDirection);
-    	}
+    //	while(Robot.driveSubsystem.getGyroAngle() > commandAngle*0.95 || Robot.driveSubsystem.getGyroAngle() < commandAngle*1.05 && DriverStation.getInstance().isAutonomous()) {
+    		Robot.driveSubsystem.arcadeDrive(0,commandRotationDirection*0.7);
+    //	}
     		
     }
 
     // Make this return true when this Command no longer needs to run execute()
     protected boolean isFinished() {
-        if(Robot.driveSubsystem.getGyroAngle() < commandAngle*0.05 || Robot.driveSubsystem.getGyroAngle() > commandAngle*-0.05) {
+        if(Math.abs(Robot.driveSubsystem.getGyroAngle()) > commandAngle*0.98 && Math.abs(Robot.driveSubsystem.getGyroAngle()) < commandAngle*1.02) {
         		return true;
         } else {
         		return false;
@@ -44,8 +48,11 @@ public class AutoDriveToAngle extends Command {
 
     // Called once after isFinished returns true
     protected void end() {
-    		System.out.println("Driven to Angle");
+    		System.out.println(Robot.driveSubsystem.gyro.getAngle());
+    		
     		Robot.driveSubsystem.arcadeDrive(0,0);
+ 
+    		
     }
 
     // Called when another command which requires one or more of the same

@@ -7,6 +7,7 @@ import org.usfirst.frc.team3680.robot.commands.DriveTeleop;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -32,7 +33,7 @@ public class DriveSubsystem extends Subsystem {
 	}
 	
 	public void arcadeDrive(double forward, double rotation) {
-		robotDrive.arcadeDrive(-rotation, forward);
+		robotDrive.arcadeDrive(-forward, rotation);
 	}
 
 	public void initDefaultCommand() {

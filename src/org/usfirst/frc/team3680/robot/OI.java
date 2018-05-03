@@ -17,15 +17,15 @@ public class OI {
 	
 	public OI() { 
 		rightStick = new Joystick(RobotMap.rightStickUSB);
-		buttonWhileHeld(rightStick, 11, new DriveLiftMotor(1));
-		buttonWhileHeld(rightStick, 10, new DriveLiftMotor(-1));
-		buttonWhenPressed(rightStick, 4, new ReleaseGrabber());
-		buttonWhenPressed(rightStick, 5, new GripGrabber());
-		buttonWhenPressed(rightStick, 6, new ExtendArm());
-		buttonWhenPressed(rightStick, 7, new RetractArm());
-		buttonWhenPressed(rightStick, 3, new LiftDriveToValue(200,1));
-		buttonWhenPressed(rightStick, 2, new LiftDriveToValue(100,1));
-		buttonWhenPressed(rightStick, 1, new LiftDriveToValue(0,1));
+		buttonWhileHeld(rightStick, 3, new DriveLiftMotor(1));
+		buttonWhileHeld(rightStick, 2, new DriveLiftMotor(-0.5));
+		buttonWhenPressed(rightStick, 6, new ReleaseGrabber());
+		buttonWhenPressed(rightStick, 7, new GripGrabber());
+		buttonWhenPressed(rightStick, 4, new ExtendArm());
+		buttonWhenPressed(rightStick, 5, new RetractArm());
+		//buttonWhenPressed(rightStick, 3, new LiftDriveToValue(8000,-0.5));
+		//buttonWhenPressed(rightStick, 2, new LiftDriveToValue(10000,-0.5));
+		//buttonWhenPressed(rightStick, 1, new LiftDriveToValue(0,0.5));
 	}
 	
 	private void buttonWhileHeld(Joystick joystick, int button, Command command) { 

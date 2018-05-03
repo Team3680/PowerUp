@@ -4,7 +4,9 @@ package org.usfirst.frc.team3680.robot;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -16,6 +18,9 @@ import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 import org.usfirst.frc.team3680.robot.commands.AutoSwitch;
 import org.usfirst.frc.team3680.robot.commands.DriveTeleop;
+import org.usfirst.frc.team3680.robot.commands.PositionCenterAuto;
+import org.usfirst.frc.team3680.robot.commands.PositionLeftAuto;
+import org.usfirst.frc.team3680.robot.commands.PositionRightAuto;
 import org.usfirst.frc.team3680.robot.subsystems.DriveSubsystem;
 import org.usfirst.frc.team3680.robot.subsystems.ExtenderSubsystem;
 import org.usfirst.frc.team3680.robot.subsystems.GrabberSubsystem;
@@ -34,36 +39,24 @@ public class Robot extends IterativeRobot {
 	public Compressor compressor = new Compressor(0);
 
 	Command autonomousCommand;
-	SendableChooser<Command> chooser = new SendableChooser<>();
-	// private VisionThread visionThread;
-	public double centerX = 0.0;
-	private final Object imgLock = new Object();
+	SendableChooser<Command> chooser1 = new SendableChooser<Command>();
+	public static String gameData;
 	
 	@Override
 	public void robotInit() {
 		oi = new OI();
-		SmartDashboard.putData("Autonomous Chooser", chooser);
-		
-		/*UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
-		camera.setExposureManual(75);
-		
-	    visionThread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-	        if (!pipeline.filterContoursOutput().isEmpty()) {
-	            Rect r = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-	            synchronized (imgLock) {
-	                centerX = r.x + (r.width / 2);
-	            }
-	        }
-	    });
-	    visionThread.start(); */
+		gameData = new String();
 	    
 	    Robot.driveSubsystem.gyro.reset();
 		Robot.driveSubsystem.gyro.calibrate();
 		Robot.liftSubsystem.encoder.reset();
 		
-		chooser.addObject("Nothing", null);
-		chooser.addDefault("AutoSwitch", new AutoSwitch());
-		
+		chooser1.addObject("Nothing", null);
+		chooser1.addObject("Position Left", new PositionLeftAuto());
+		chooser1.addDefault("Position Center", new PositionCenterAuto());
+		chooser1.addObject("Position Right", new PositionRightAuto());
+		SmartDashboard.putData("Autonomous Chooser Me", chooser1);
+		compressor.start();
 		}
 	
 
@@ -81,39 +74,43 @@ public class Robot extends IterativeRobot {
 
 	@Override
 	public void autonomousInit() {
-		if(chooser.getSelected() != null) {
-			chooser.getSelected().start();
+		if(DriverStation.getInstance().getGameSpecificMessage() != null) {
+			gameData = DriverStation.getInstance().getGameSpecificMessage();
+		} else {
+			gameData = "LLL";
 		}
+		if (chooser1.getSelected() != null) {
+			chooser1.getSelected().start();
+		}
+		//autonomousCommand = new PositionLeftAuto();
+		//autonomousCommand.start();
+		compressor.start();
 	}
 
 	@Override
 	public void autonomousPeriodic() {
+		//System.out.println(Robot.driveSubsystem.getGyroAngle());
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("Angle", Robot.driveSubsystem.getGyroAngle());
 	}
 
 	@Override
 	public void teleopInit() {
-		chooser.getSelected().cancel();
+		if (chooser1.getSelected() != null) {
+			chooser1.getSelected().cancel();
+		}
+		
 		compressor.start();
+		
+	 //if(autonomousCommand != null) { autonomousCommand.cancel(); }
 	}
 
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		SmartDashboard.putNumber("Angle", Robot.driveSubsystem.getGyroAngle());
-		/*double centerX;
-		synchronized (imgLock) {
-			centerX = this.centerX;
-		} */
-		
-		if(Robot.liftSubsystem.getLimitSwitch() == true) {
-			Robot.liftSubsystem.resetEncoder();
-		}
+
 	}
 
 	@Override
 	public void testPeriodic() {
-		LiveWindow.run();
 	}
 }
